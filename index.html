@@ -4,20 +4,24 @@
     <title>three.js webgl - geometry hierarchy</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <style>
-        body {
-            background:#fff;
-            padding:0;
-            margin:0;
-            font-weight: bold;
-            overflow:hidden;
-        }
-    </style>
+    <link href="css/libs/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+
+    <script src="js/libs/jquery-3.3.1.min.js"></script>
+    <script src="js/libs/three.js"></script>
+    <script src="js/libs/stats.js"></script>
+    <script src="js/libs/controls/OrbitControls.js"></script>
+    <script src="js/libs/bootstrap.min.js"></script>
+
 </head>
 <body>
-<script src="js/libs/three.js"></script>
-<script src="js/libs/stats.js"></script>
-<script src="js/libs/controls/OrbitControls.js"></script>
+<div class="ctr_panel">
+    <div class="ctr_stats"></div>
+    <div class="ctr_ctr"></div>
+
+    <button type="button" class="btn btn-primary">stop</button>
+
+</div>
 
 <script>
     var camera, scene, renderer, stats, controls;
@@ -26,12 +30,14 @@
     var windowHalfX = window.innerWidth / 2;
     var windowHalfY = window.innerHeight / 2;
 
+
+    var dd = 1;
     var sizeX = 20;
     var sizeY = 20;
-  //  var gameOfLifeArray = [[],[]];
     var gameOfLifeArray  = [];
+    var state = 0;
 
-    while(gameOfLifeArray.push([]) < sizeX);
+    //while(gameOfLifeArray.push([]) < sizeX);
 
     var cell = new THREE.BoxBufferGeometry( 0.9, 0.9, 0.9 );
     var material = new THREE.MeshNormalMaterial();
@@ -39,41 +45,42 @@
     init();
     animate();
 
-    
-    
     function init_gameOfLife() {
-        /*
-        gameOfLifeArray = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
-*/
+
+        gameOfLifeArray = [[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1],
+                           [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0],
+                           [0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],
+                           [1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                           [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0],
+                           [0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+/*
         for ( var y = 0; y < sizeX; y++ ) {
             for ( var x = 0; x < sizeY; x++ ) {
                 gameOfLifeArray[x][y] = Math.round(Math.random());
 
-                }
             }
+        }
+        */
     }
 
     function checkCellState(gameOfLifeArrayOldGen, x,y) {
         if(typeof gameOfLifeArrayOldGen[x] === 'undefined')
+            return 0;
+        else if(typeof gameOfLifeArrayOldGen[x][y] === 'undefined')
             return 0;
         else if (gameOfLifeArrayOldGen[x][y] === 0)
             return 0;
@@ -81,22 +88,32 @@
             return 1;
     }
 
-    function checkNeighbours(gameOfLifeArrayOldGen, x,y) {
-        var neighbours = checkCellState(gameOfLifeArrayOldGen, x+1,y) + checkCellState(gameOfLifeArrayOldGen, x+1,y+1) + checkCellState(gameOfLifeArrayOldGen, x,y+1) + checkCellState(gameOfLifeArrayOldGen, x-1,y+1) +
-            checkCellState(gameOfLifeArrayOldGen, x-1,y) + checkCellState(gameOfLifeArrayOldGen, x-1,y-1) + checkCellState(gameOfLifeArrayOldGen, x,y-1) + checkCellState(gameOfLifeArrayOldGen, x+1,y-1);
+    function checkNeighbours(gameOfLifeArrayOldGen, x, y)
+    {
+        var neighbours = checkCellState(gameOfLifeArrayOldGen, x+1, y)   +
+                         checkCellState(gameOfLifeArrayOldGen, x+1, y+1) +
+                         checkCellState(gameOfLifeArrayOldGen, x,   y+1) +
+                         checkCellState(gameOfLifeArrayOldGen, x-1, y+1) +
+                         checkCellState(gameOfLifeArrayOldGen, x-1, y)   +
+                         checkCellState(gameOfLifeArrayOldGen, x-1, y-1) +
+                         checkCellState(gameOfLifeArrayOldGen, x,   y-1) +
+                         checkCellState(gameOfLifeArrayOldGen, x+1, y-1);
         if (isNaN(neighbours))
             neighbours = 0;
+
         return neighbours;
     }
 
-    function gameOfLife() {
-        var gameOfLifeArrayOldGen = gameOfLifeArray.slice();
-        console.log("game");
-        for (var x = 0; x < sizeX; x++) {
-            for (var y = 0; y < sizeY; y++) {
+    function gameOfLife()
+    {
+        var gameOfLifeArrayOldGen = Array.from(gameOfLifeArray);
+        for (var x = 0; x < sizeX; x++)
+        {
+            for (var y = 0; y < sizeY; y++)
+            {
                 var neighbours = checkNeighbours(gameOfLifeArrayOldGen, x,y);
-
-                if(gameOfLifeArrayOldGen[x][y] === 1)
+                dd = 0;
+                if(gameOfLifeArrayOldGen[x][y] === 1) //si cell  viviante
                 {
                     if (neighbours < 2)
                         gameOfLifeArray[x][y] = 0;
@@ -104,59 +121,43 @@
                     else if (neighbours > 3)
                         gameOfLifeArray[x][y] = 0;
                 }
-                else
+                else //ai cell morte
                 {
                     if (neighbours === 3)
                         gameOfLifeArray[x][y] = 1;
                 }
-
             }
         }
     }
-    function init() {
 
-        console.log(gameOfLifeArray);
-
+    function init()
+    {
         camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 ); //camera init
         camera.position.z = 30;
-
         scene = new THREE.Scene();
         scene.background = new THREE.Color( 0xffffff );
         scene.fog = new THREE.Fog( 0xffffff, 1, 10000 );
-
         controls = new THREE.OrbitControls( camera );
-
-        init_gameOfLife();
-
-
         var back_plane_geometry = new THREE.PlaneGeometry( sizeX, sizeY );
         var back_plane_material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
         var plane = new THREE.Mesh( back_plane_geometry, back_plane_material );
         plane.position.z = -0.5;
         scene.add( plane );
-
-
-        //
-
         renderer = new THREE.WebGLRenderer( { antialias: true } );
         renderer.setPixelRatio( window.devicePixelRatio );
         renderer.setSize( window.innerWidth, window.innerHeight );
         document.body.appendChild( renderer.domElement );
-
         stats = new Stats();
-        document.body.appendChild( stats.dom );
-
-        //
-
-       //    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-
-        //
-
+        stats.dom.style.position = 'relative';
+        $('.ctr_stats').append( stats.dom );
         window.addEventListener( 'resize', onWindowResize, false );
 
+        init_gameOfLife();
+        console.log(gameOfLifeArray);
     }
 
-    function onWindowResize() {
+    function onWindowResize()
+    {
 
         windowHalfX = window.innerWidth / 2;
         windowHalfY = window.innerHeight / 2;
@@ -168,29 +169,27 @@
 
     }
 
-    function onDocumentMouseMove( event ) {
+    function onDocumentMouseMove( event )
+    {
 
         mouseX = ( event.clientX - windowHalfX ) * 10;
         mouseY = ( event.clientY - windowHalfY ) * 10;
 
     }
 
-    //
-
     var last = 0; // timestamp of the last render() call
-    function animate(now) {
 
-
-
-
+    function animate(now)
+    {
         group = new THREE.Group();
         group.position.x = - sizeY /2;
         group.position.y = sizeX /2;
-
         scene.add(group);
 
-        for ( var y = 0; y < sizeX; y++ ) {
-            for ( var x = 0; x < sizeY; x++ ) {
+        for ( var y = 0; y < sizeX; y++ )
+        {
+            for ( var x = 0; x < sizeY; x++ )
+            {
 
                 if(gameOfLifeArray[x][y] === 1)
                 {
@@ -205,34 +204,35 @@
 
                     group.add(mesh);
                 }
-
             }
         }
 
-        if(!last || now - last >= 2*1000) {
+        if(!last || now - last >= 2*1000)
+        {
             last = now;
 
         }
-
-        gameOfLife();
-        requestAnimationFrame( animate );
+        if(state === 1)
+        {
+            gameOfLife();
+        }
+        else if(state === 2)
+        {
+            gameOfLife();
+            state = 0;
+        }
+        requestAnimationFrame(animate);
         controls.update();
         render();
         stats.update();
         scene.remove(group);
-
     }
 
-
-    function render() {
-
+    function render()
+    {
         var time = Date.now() * 0.001;
-
         renderer.render( scene, camera );
-
     }
-
 </script>
-
 </body>
 </html>
